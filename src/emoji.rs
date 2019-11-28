@@ -3,11 +3,10 @@ extern crate image;
 use std::collections::HashMap;
 use std::error::Error;
 use std::path::Path;
-use crate::image::GenericImageView;
 use kdtree::KdTree;
 
 const NUM_RGB_CHANNELS: usize = 3;
-const NUM_EMOJIS: u32 = 2363;
+const NUM_EMOJIS: u32 = 2263;
 
 pub struct EmojiManager<'a> {
     emoji_dir_path: &'a Path, 
@@ -34,7 +33,7 @@ impl<'a> EmojiManager<'a> {
         Ok(EmojiManager {
             emoji_dir_path,
             emoji_cache: HashMap::new(),
-            emoji_kd_tree: KdTree::new(NUM_RGB_CHANNELS),
+            emoji_kd_tree,
         })
     }
 
@@ -43,12 +42,12 @@ impl<'a> EmojiManager<'a> {
         if !self.emoji_cache.contains_key(&emoji_id) {
             let emoji_path = format!("{}/{}.png", self.emoji_dir_path.display(), emoji_id);
             let loaded_emoji = image::open(emoji_path).expect(&format!("Couldn't read emoji with id: {}", emoji_id).to_string());
-            self.emoji_cache.insert(emoji_id, loaded_emoji.resize(30, 30, image::FilterType::Lanczos3));
+            self.emoji_cache.insert(emoji_id, loaded_emoji.resize(15, 15, image::FilterType::Lanczos3));
         }
         self.emoji_cache.get(&emoji_id)
     }
 
-    pub fn get_nearest_emoji_id(&mut self, pixel: image::Rgba<u32>) -> u32 {
+    pub fn get_nearest_emoji_id(&mut self, pixel: image::Rgba<u8>) -> u32 {
         let pixel_rgb = [pixel[0] as f64, pixel[1] as f64, pixel[2] as f64];
         let (_, nearest_emoji_id) = self.emoji_kd_tree.nearest(&pixel_rgb, 1, &kdtree::distance::squared_euclidean).unwrap()[0];
         *nearest_emoji_id
@@ -60,16 +59,23 @@ fn get_average_rgb(img: &image::DynamicImage) -> [f64; NUM_RGB_CHANNELS] {
     let mut average_g: f64 = 0.0;
     let mut average_b: f64 = 0.0;
 
+    let mut opaque_pixel_count: f64 = 0.0;
+
     for (_, _, p) in img.to_rgba().enumerate_pixels() {
+        if p[3] == 0 {
+            continue;
+        }
+
         average_r += p[0] as f64;
         average_g += p[1] as f64;
         average_b += p[2] as f64;
+
+        opaque_pixel_count += 1.0;
     }
 
-    let total_num_pixels = (img.height() * img.width()) as f64;
-    average_r /= total_num_pixels;
-    average_g /= total_num_pixels;
-    average_b /= total_num_pixels;
+    average_r /= opaque_pixel_count;
+    average_g /= opaque_pixel_count;
+    average_b /= opaque_pixel_count;
 
     [average_r as f64, average_g as f64, average_b as f64]
 }
