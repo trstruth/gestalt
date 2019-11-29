@@ -1,7 +1,6 @@
 extern crate image;
 
 use std::error::Error;
-use rand::Rng;
 
 mod canvas;
 mod emoji;
@@ -16,12 +15,18 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("Generating new CanvasManager");
     let mut cm = canvas::CanvasManager::new("canvas.png", CANVAS_WIDTH, CANVAS_HEIGHT)?;
 
+    let target = image::open("cyberpunk.png").unwrap();
+
     println!("Placing emojis");
 
-    let mut rng = rand::thread_rng();
-    for i in 0..100 {
-        println!("Emoji #{}", i);
+    for (x, y, p) in target.to_rgba().enumerate_pixels() {
+        let nearest_emoji_id = em.get_nearest_emoji_id(p);
+        let emoji = em.get_emoji(nearest_emoji_id).unwrap();
+        cm.place_emoji(emoji, x, y);
+    }
 
+    /*
+    for _ in 0..10000 {
         let emoji_num = rng.gen_range(0, NUM_EMOJIS);
         let emoji = em.get_emoji(emoji_num).unwrap();
 
@@ -29,7 +34,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         let rand_y = rng.gen_range(0, CANVAS_HEIGHT);
         cm.place_emoji(emoji, rand_x, rand_y);
     }
+    */
 
+    println!("Saving canvas");
     cm.save_canvas();
 
     Ok(())
