@@ -1,8 +1,7 @@
 extern crate image;
-extern crate rand;
 
+use clap::{App, Arg};
 use rand::Rng;
-use std::env;
 use std::error::Error;
 
 mod canvas;
@@ -16,29 +15,42 @@ mod emoji;
 */
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let num_iterations = 500000;
-    let output = "canvas.png";
-    let scale = 3;
+    let m = parse_args().get_matches();
 
-    let args: Vec<String> = env::args().collect();
-    if args.len() < 2 {
-        panic!("Please provide a path to the target image");
-    }
-    let target_path = &args[1];
+    let num_iterations = match m.value_of("num_iterations") {
+        Some(num_str) => num_str.parse::<u32>()?,
+        None => 500000,
+    };
+    let output = match m.value_of("output") {
+        Some(output) => output,
+        None => "canvas.png",
+    };
+    let scale = match m.value_of("scale") {
+        Some(scale_str) => scale_str.parse::<u32>()?,
+        None => 1,
+    };
+
+    let target_path = match m.value_of("target_path") {
+        Some(target_path) => target_path,
+        None => return Err("Please provide a path to the target image".into()),
+    };
     let target = image::open(target_path).unwrap();
     let target_rgba = target.to_rgba();
     let (width, height) = target_rgba.dimensions();
+    println!("Opened image {} {}x{}", target_path, width, height);
 
     println!("Generating new EmojiManager");
     let mut em = emoji::EmojiManager::new("emojis")?;
-    println!("Generating new CanvasManager");
-    let mut cm = canvas::CanvasManager::new(output, width * scale, height * scale)?;
 
-    // let target = image::open("cyberpunk.png").unwrap();
-    // let target = image::open("basquiat.jpg").unwrap();
-    // let target = image::open("bladerunner.png").unwrap();
+    let canvas_width = width * scale;
+    let canvas_height = height * scale;
+    println!(
+        "Generating new CanvasManager with dimensions {}x{}",
+        canvas_width, canvas_height
+    );
+    let mut cm = canvas::CanvasManager::new(output, canvas_width, canvas_height)?;
 
-    println!("Placing emojis");
+    println!("Placing emojis: {} iterations", num_iterations);
 
     let mut rng = rand::thread_rng();
     for _ in 0..num_iterations {
@@ -51,8 +63,34 @@ fn main() -> Result<(), Box<dyn Error>> {
         cm.place_emoji(emoji, rand_x * scale, rand_y * scale);
     }
 
-    println!("Saving canvas");
+    println!("Saving output to file: {}", output);
     cm.save_canvas();
 
     Ok(())
+}
+
+fn parse_args<'a, 'b>() -> App<'a, 'b> {
+    App::new("emvision")
+        .author("trstruth")
+        .version("0.1.0")
+        .about("Generates an emoji vision image")
+        .arg(Arg::with_name("target_path").required(true).index(1))
+        .arg(
+            Arg::with_name("num_iterations")
+                .short("n")
+                .long("num-iterations")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("output")
+                .short("o")
+                .long("output")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("scale")
+                .short("s")
+                .long("scale")
+                .takes_value(true),
+        )
 }
