@@ -1,5 +1,3 @@
-extern crate image;
-
 use clap::{App, Arg};
 use rand::Rng;
 use std::error::Error;

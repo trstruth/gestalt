@@ -1,5 +1,3 @@
-extern crate image;
-
 use kdtree::KdTree;
 use std::collections::HashMap;
 use std::error::Error;
