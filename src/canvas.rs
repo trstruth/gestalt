@@ -5,7 +5,7 @@ use std::path::Path;
 
 pub struct CanvasManager<'a> {
     canvas_path: &'a Path,
-    canvas: image::RgbaImage,
+    pub canvas: image::RgbaImage,
 }
 
 impl<'a> CanvasManager<'a> {

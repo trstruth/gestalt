@@ -44,7 +44,7 @@ impl<'a> EmojiManager<'a> {
                 .expect(&format!("Couldn't read emoji with id: {}", emoji_id).to_string());
             self.emoji_cache.insert(
                 emoji_id,
-                loaded_emoji.resize(20, 20, image::FilterType::Lanczos3),
+                loaded_emoji.resize(20, 20, image::imageops::FilterType::Lanczos3),
             );
         }
         self.emoji_cache.get(&emoji_id)
@@ -67,7 +67,7 @@ fn get_average_rgb(img: &image::DynamicImage) -> [f64; NUM_RGB_CHANNELS] {
 
     let mut opaque_pixel_count: f64 = 0.0;
 
-    for (_, _, p) in img.to_rgba().enumerate_pixels() {
+    for (_, _, p) in img.to_rgba8().enumerate_pixels() {
         if p[3] == 0 {
             continue;
         }
