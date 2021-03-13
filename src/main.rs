@@ -5,13 +5,6 @@ use std::error::Error;
 mod canvas;
 mod emoji;
 
-/*
- * arg: path to image
- * -n --num-iterations (20000): number of times to place an emoji
- * -o --output (canvas.png): output file path
- * -s --scale (1): resolution ratio of output:target images
-*/
-
 fn main() -> Result<(), Box<dyn Error>> {
     let m = parse_args().get_matches();
 
@@ -22,6 +15,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let output = match m.value_of("output") {
         Some(output) => output,
         None => "canvas.png",
+    };
+    let image_size = match m.value_of("image_size") {
+        Some(image_size_str) => image_size_str.parse::<u32>()?,
+        None => 20,
     };
     let scale = match m.value_of("scale") {
         Some(scale_str) => scale_str.parse::<u32>()?,
@@ -52,7 +49,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     );
     let mut cm = canvas::CanvasManager::new(output, canvas_width, canvas_height)?;
 
-    println!("Placing emojis: {} iterations", num_iterations);
+    println!(
+        "Placing emojis - size: {}, iterations: {}",
+        image_size, num_iterations
+    );
 
     let mut rng = rand::thread_rng();
     for _ in 0..num_iterations {
@@ -60,7 +60,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         let rand_y = rng.gen_range(0, height);
         let target_p = target_rgba.get_pixel(rand_x, rand_y);
 
-        let emoji = em.get_nearest_emoji(*target_p).unwrap();
+        let emoji = em.get_nearest_emoji(*target_p, image_size).unwrap();
         cm.place_emoji(emoji, rand_x * scale, rand_y * scale);
     }
 
@@ -98,6 +98,12 @@ fn parse_args<'a, 'b>() -> App<'a, 'b> {
             Arg::with_name("emoji_dir")
                 .short("e")
                 .long("emoji-dir")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("image_size")
+                .short("z")
+                .long("image-size")
                 .takes_value(true),
         )
 }

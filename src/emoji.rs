@@ -33,6 +33,7 @@ impl EmojiManager {
                     continue;
                 }
             };
+
             let average_rgb = get_average_rgb(&loaded_emoji);
 
             emoji_kd_tree.add(average_rgb, emoji_path_str).unwrap();
@@ -45,7 +46,11 @@ impl EmojiManager {
         })
     }
 
-    pub fn get_nearest_emoji(&mut self, pixel: image::Rgba<u8>) -> Option<&image::DynamicImage> {
+    pub fn get_nearest_emoji(
+        &mut self,
+        pixel: image::Rgba<u8>,
+        image_size: u32,
+    ) -> Option<&image::DynamicImage> {
         // get nearest emoji path
         let pixel_rgb = [pixel[0] as f64, pixel[1] as f64, pixel[2] as f64];
         let (_, nearest_emoji_path) = self
@@ -55,11 +60,28 @@ impl EmojiManager {
 
         // get emoji
         if !self.emoji_cache.contains_key(nearest_emoji_path) {
-            let loaded_emoji = image::open(nearest_emoji_path)
-                .expect(&format!("Couldn't read emoji with path: {}", nearest_emoji_path).to_string());
+            let loaded_emoji = image::open(nearest_emoji_path).expect(
+                &format!("Couldn't read emoji with path: {}", nearest_emoji_path).to_string(),
+            );
+
+            let (width, height) = loaded_emoji.to_rgba().dimensions();
+            let width_scale: f32 = width as f32 / image_size as f32;
+            let height_scale: f32 = height as f32 / image_size as f32;
+
+            let new_width: u32;
+            let new_height: u32;
+
+            if width_scale > height_scale {
+                new_width = image_size;
+                new_height = height * image_size / width;
+            } else {
+                new_width = width * image_size / height;
+                new_height = image_size;
+            }
+
             self.emoji_cache.insert(
                 nearest_emoji_path.to_string(),
-                loaded_emoji.resize(20, 20, image::FilterType::Lanczos3),
+                loaded_emoji.resize(new_width, new_height, image::FilterType::Lanczos3),
             );
         }
         self.emoji_cache.get(nearest_emoji_path)
