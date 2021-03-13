@@ -1,8 +1,8 @@
-# emvision
+# gestalt
 ge·stalt /ɡəˈSHtält/: an organized whole that is perceived as more than the sum of its parts.
 
 ### Overview
-emvision is a command line tool written in rust which allows a user to recreate an image by composing many smaller images.  The algorithm runs for some number of `iterations`.  On each iteration, it
+gestalt is a command line tool written in rust which allows a user to recreate an image by composing many smaller images.  The algorithm runs for some number of `iterations`.  On each iteration, it
 1. selects a random pixel from the source image
 2. finds the picture with an "average rgb" value closest to the selected pixels rgb value
 3. places the found image on a "canvas" in the same location as the selected pixel
@@ -16,23 +16,23 @@ To illustrate this, we compare the output of varying iterations:
 | 50000                | <img src="output/blond-50000-iters.png" alt="50000 iters" /> |
 | source image         | <img src="images/blond.jpg" alt="source image" />            |
 
-By varying the number of iterations, we arrive at different results.  However, the number of iterations is only one of many parameters that emvision allows the user to specify.  For a more detailed discussion, see the usage section.
+By varying the number of iterations, we arrive at different results.  However, the number of iterations is only one of many parameters that gestalt allows the user to specify.  For a more detailed discussion, see the usage section.
 
 ### Installation
-emvision is a rust project, and as such the user must first install the rust toolchain on their computer.  Follow the instructions [here](https://www.rust-lang.org/tools/install) to get started.
+gestalt is a rust project, and as such the user must first install the rust toolchain on their computer.  Follow the instructions [here](https://www.rust-lang.org/tools/install) to get started.
 
 after rust is installed, clone the repo, build the project, and view usage instructions
 ```
-$ git clone git@github.com:trstruth/emvision.git
-$ cd emvision
+$ git clone git@github.com:trstruth/gestalt.git
+$ cd gestalt
 $ cargo build --release
-$ ./target/release/emvision --help
-emvision 0.1.0
+$ ./target/release/gestalt --help
+gestalt 0.1.0
 trstruth
 Generates an emoji vision image
 
 USAGE:
-    emvision [OPTIONS] <target_path>
+    gestalt [OPTIONS] <target_path>
 
 FLAGS:
     -h, --help       Prints help information
@@ -50,20 +50,20 @@ ARGS:
 ```
 
 ### Usage
-The usage for emvision follows the standard cli tool format:
+The usage for gestalt follows the standard cli tool format:
 
-`./target/release/emvision --<option 1 name> <option 1 value> ... --<option n name> <option n value> <target_path>`
+`./target/release/gestalt --<option 1 name> <option 1 value> ... --<option n name> <option n value> <target_path>`
 
 For example, to create an image from `foo.png` with 200 iterations and save the output to `bar.png` the following command would be used
 
-`./target/release/emvision --num-iterations 200 --output bar.png foo.png`
+`./target/release/gestalt --num-iterations 200 --output bar.png foo.png`
 
 One can use the "short" name of the options as well.  The equivalent abbreviation of the above would be
 
-`./target/release/emvision -n 200 -o bar.png foo.png`
+`./target/release/gestalt -n 200 -o bar.png foo.png`
 
 ### Options
-emvision allows the users to specify the following options:
+gestalt allows the users to specify the following options:
 | option                                | effect                                                                                                                                                                                                                                                |
 |---------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | -e, --emoji-dir <emoji_dir>           | A path to a folder containing the subimages to be used when composing the desired image.  Defaults to `emojis`                                                                                                                                        |
