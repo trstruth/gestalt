@@ -38,7 +38,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("Opened image {} {}x{}", target_path, width, height);
 
     println!("Generating new EmojiManager");
-    let mut em = emoji::EmojiManager::new("emojis")?;
+    let mut em = emoji::EmojiManager::new("bottles")?;
 
     let canvas_width = width * scale;
     let canvas_height = height * scale;
@@ -56,8 +56,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         let rand_y = rng.gen_range(0, height);
         let target_p = target_rgba.get_pixel(rand_x, rand_y);
 
-        let nearest_emoji_id = em.get_nearest_emoji_id(*target_p);
-        let emoji = em.get_emoji(nearest_emoji_id).unwrap();
+        // let nearest_emoji_path = em.get_nearest_emoji_path(*target_p);
+        // let emoji = em.get_emoji(nearest_emoji_path).unwrap();
+        let emoji = em.get_nearest_emoji(*target_p).unwrap();
         cm.place_emoji(emoji, rand_x * scale, rand_y * scale);
     }
 
