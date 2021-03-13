@@ -27,6 +27,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         Some(scale_str) => scale_str.parse::<u32>()?,
         None => 1,
     };
+    let emoji_dir = match m.value_of("emoji_dir") {
+        Some(output) => output,
+        None => "emojis",
+    };
 
     let target_path = match m.value_of("target_path") {
         Some(target_path) => target_path,
@@ -38,7 +42,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("Opened image {} {}x{}", target_path, width, height);
 
     println!("Generating new EmojiManager");
-    let mut em = emoji::EmojiManager::new("emojis")?;
+    let mut em = emoji::EmojiManager::new(emoji_dir)?;
 
     let canvas_width = width * scale;
     let canvas_height = height * scale;
@@ -56,8 +60,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         let rand_y = rng.gen_range(0, height);
         let target_p = target_rgba.get_pixel(rand_x, rand_y);
 
-        let nearest_emoji_id = em.get_nearest_emoji_id(*target_p);
-        let emoji = em.get_emoji(nearest_emoji_id).unwrap();
+        let emoji = em.get_nearest_emoji(*target_p).unwrap();
         cm.place_emoji(emoji, rand_x * scale, rand_y * scale);
     }
 
@@ -89,6 +92,12 @@ fn parse_args<'a, 'b>() -> App<'a, 'b> {
             Arg::with_name("scale")
                 .short("s")
                 .long("scale")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("emoji_dir")
+                .short("e")
+                .long("emoji-dir")
                 .takes_value(true),
         )
 }

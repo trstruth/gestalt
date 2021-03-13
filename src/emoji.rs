@@ -1,19 +1,18 @@
 use kdtree::KdTree;
 use std::collections::HashMap;
 use std::error::Error;
+use std::fs;
 use std::path::Path;
 
 const NUM_RGB_CHANNELS: usize = 3;
-const NUM_EMOJIS: u32 = 2263;
 
-pub struct EmojiManager<'a> {
-    emoji_dir_path: &'a Path,
-    emoji_cache: HashMap<u32, image::DynamicImage>,
-    emoji_kd_tree: KdTree<f64, u32, [f64; NUM_RGB_CHANNELS]>,
+pub struct EmojiManager {
+    emoji_cache: HashMap<String, image::DynamicImage>,
+    emoji_kd_tree: KdTree<f64, String, [f64; NUM_RGB_CHANNELS]>,
 }
 
-impl<'a> EmojiManager<'a> {
-    pub fn new(emoji_dir_string: &'a str) -> Result<EmojiManager<'a>, Box<dyn Error>> {
+impl EmojiManager {
+    pub fn new(emoji_dir_string: &str) -> Result<EmojiManager, Box<dyn Error>> {
         let emoji_dir_path = Path::new(emoji_dir_string);
         if !emoji_dir_path.exists() {
             let err_msg = format!("invalid path: {}", emoji_dir_string);
@@ -21,42 +20,49 @@ impl<'a> EmojiManager<'a> {
         }
 
         let mut emoji_kd_tree = KdTree::new(NUM_RGB_CHANNELS);
-        for emoji_id in 0..NUM_EMOJIS {
-            let emoji_path = format!("{}/{}.png", emoji_dir_path.display(), emoji_id);
-            let loaded_emoji = image::open(emoji_path)
-                .expect(&format!("Couldn't read emoji with id: {}", emoji_id).to_string());
+
+        let mut emoji_id = 0;
+        for entry in fs::read_dir(emoji_dir_path)? {
+            let emoji_path = entry?.path();
+            let emoji_path_str = emoji_path.to_str().unwrap().to_string();
+
+            let loaded_emoji = match image::open(emoji_path) {
+                Ok(image) => image,
+                Err(_) => {
+                    println!("Couldn't read emoji with id: {}", emoji_id);
+                    continue;
+                }
+            };
             let average_rgb = get_average_rgb(&loaded_emoji);
-            emoji_kd_tree.add(average_rgb, emoji_id as u32).unwrap();
+
+            emoji_kd_tree.add(average_rgb, emoji_path_str).unwrap();
+            emoji_id += 1;
         }
 
         Ok(EmojiManager {
-            emoji_dir_path,
             emoji_cache: HashMap::new(),
             emoji_kd_tree,
         })
     }
 
-    pub fn get_emoji(&mut self, emoji_id: u32) -> Option<&image::DynamicImage> {
-        // consider using `entry` and `or_insert_with` here
-        if !self.emoji_cache.contains_key(&emoji_id) {
-            let emoji_path = format!("{}/{}.png", self.emoji_dir_path.display(), emoji_id);
-            let loaded_emoji = image::open(emoji_path)
-                .expect(&format!("Couldn't read emoji with id: {}", emoji_id).to_string());
-            self.emoji_cache.insert(
-                emoji_id,
-                loaded_emoji.resize(20, 20, image::FilterType::Lanczos3),
-            );
-        }
-        self.emoji_cache.get(&emoji_id)
-    }
-
-    pub fn get_nearest_emoji_id(&mut self, pixel: image::Rgba<u8>) -> u32 {
+    pub fn get_nearest_emoji(&mut self, pixel: image::Rgba<u8>) -> Option<&image::DynamicImage> {
+        // get nearest emoji path
         let pixel_rgb = [pixel[0] as f64, pixel[1] as f64, pixel[2] as f64];
-        let (_, nearest_emoji_id) = self
+        let (_, nearest_emoji_path) = self
             .emoji_kd_tree
             .nearest(&pixel_rgb, 1, &kdtree::distance::squared_euclidean)
             .unwrap()[0];
-        *nearest_emoji_id
+
+        // get emoji
+        if !self.emoji_cache.contains_key(nearest_emoji_path) {
+            let loaded_emoji = image::open(nearest_emoji_path)
+                .expect(&format!("Couldn't read emoji with path: {}", nearest_emoji_path).to_string());
+            self.emoji_cache.insert(
+                nearest_emoji_path.to_string(),
+                loaded_emoji.resize(20, 20, image::FilterType::Lanczos3),
+            );
+        }
+        self.emoji_cache.get(nearest_emoji_path)
     }
 }
 
