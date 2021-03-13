@@ -60,8 +60,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         let rand_y = rng.gen_range(0, height);
         let target_p = target_rgba.get_pixel(rand_x, rand_y);
 
-        // let nearest_emoji_path = em.get_nearest_emoji_path(*target_p);
-        // let emoji = em.get_emoji(nearest_emoji_path).unwrap();
         let emoji = em.get_nearest_emoji(*target_p).unwrap();
         cm.place_emoji(emoji, rand_x * scale, rand_y * scale);
     }
