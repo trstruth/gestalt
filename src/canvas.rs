@@ -41,4 +41,8 @@ impl<'a> CanvasManager<'a> {
             .save(self.canvas_path)
             .expect("couldn't save canvas")
     }
+
+    pub fn save_canvas_to(&self, p: &Path) {
+        self.canvas.save(p).expect("couldn't save canvas")
+    }
 }

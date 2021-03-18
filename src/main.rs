@@ -1,6 +1,7 @@
 use clap::{App, Arg};
 use rand::Rng;
 use std::error::Error;
+use std::path::{Path, PathBuf};
 
 mod canvas;
 mod emoji;
@@ -28,11 +29,15 @@ fn main() -> Result<(), Box<dyn Error>> {
         Some(output) => output,
         None => "emojis",
     };
-
     let target_path = match m.value_of("target_path") {
         Some(target_path) => target_path,
         None => return Err("Please provide a path to the target image".into()),
     };
+    let gif_flag = match m.occurrences_of("gif") {
+        1 => true,
+        _ => false,
+    };
+
     let target = image::open(target_path).unwrap();
     let target_rgba = target.to_rgba();
     let (width, height) = target_rgba.dimensions();
@@ -55,13 +60,25 @@ fn main() -> Result<(), Box<dyn Error>> {
     );
 
     let mut rng = rand::thread_rng();
-    for _ in 0..num_iterations {
+    for idx in 0..num_iterations {
         let rand_x = rng.gen_range(0, width);
         let rand_y = rng.gen_range(0, height);
         let target_p = target_rgba.get_pixel(rand_x, rand_y);
 
         let emoji = em.get_nearest_emoji(*target_p, image_size).unwrap();
         cm.place_emoji(emoji, rand_x * scale, rand_y * scale);
+        if gif_flag {
+            let path = Path::new(output);
+            let parent = path.parent().unwrap();
+            let mut file_stem = path.file_stem().unwrap().to_os_string();
+            file_stem.push(format!("{}.png", idx));
+            let mut gif_path = PathBuf::new();
+            gif_path.push(parent);
+            gif_path.push(Path::new(&file_stem));
+
+            println!("gif_path is {}", gif_path.as_path().to_str().unwrap());
+            cm.save_canvas_to(&gif_path);
+        }
     }
 
     println!("Saving output to file: {}", output);
@@ -105,5 +122,11 @@ fn parse_args<'a, 'b>() -> App<'a, 'b> {
                 .short("z")
                 .long("image-size")
                 .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("gif")
+                .short("g")
+                .long("gif")
+                .takes_value(false),
         )
 }
