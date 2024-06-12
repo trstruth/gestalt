@@ -12,10 +12,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Some(num_str) => num_str.parse::<u32>()?,
         None => 500000,
     };
-    let output = match m.value_of("output") {
-        Some(output) => output,
-        None => "canvas.png",
-    };
+    let output = m.value_of("output").unwrap_or("canvas.png");
     let image_size = match m.value_of("image_size") {
         Some(image_size_str) => image_size_str.parse::<u32>()?,
         None => 20,
@@ -24,10 +21,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Some(scale_str) => scale_str.parse::<u32>()?,
         None => 1,
     };
-    let emoji_dir = match m.value_of("emoji_dir") {
-        Some(output) => output,
-        None => "emojis",
-    };
+    let emoji_dir = m.value_of("emoji_dir").unwrap_or("emojis");
 
     let target_path = match m.value_of("target_path") {
         Some(target_path) => target_path,

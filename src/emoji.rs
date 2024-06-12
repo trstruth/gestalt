@@ -65,9 +65,12 @@ impl EmojiManager {
 
         // get emoji
         if !self.emoji_cache.contains_key(nearest_emoji_path) {
-            let loaded_emoji = image::open(nearest_emoji_path).expect(
-                &format!("Couldn't read emoji with path: {}", nearest_emoji_path).to_string(),
-            );
+            let loaded_emoji = image::open(nearest_emoji_path).unwrap_or_else(|_| {
+                panic!(
+                    "{}",
+                    format!("Couldn't read emoji with path: {}", nearest_emoji_path).to_string()
+                )
+            });
 
             let (width, height) = loaded_emoji.to_rgba().dimensions();
             let width_scale: f32 = width as f32 / image_size as f32;
@@ -116,5 +119,5 @@ fn get_average_rgb(img: &image::DynamicImage) -> [f64; NUM_RGB_CHANNELS] {
     average_g /= opaque_pixel_count;
     average_b /= opaque_pixel_count;
 
-    [average_r as f64, average_g as f64, average_b as f64]
+    [average_r, average_g, average_b]
 }
