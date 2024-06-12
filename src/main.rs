@@ -60,8 +60,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         let rand_y = rng.gen_range(0, height);
         let target_p = target_rgba.get_pixel(rand_x, rand_y);
 
-        let emoji = em.get_nearest_emoji(*target_p, image_size).unwrap();
-        cm.place_emoji(emoji, rand_x * scale, rand_y * scale);
+        match em.get_nearest_emoji(*target_p, image_size) {
+            Some(emoji) => cm.place_emoji(emoji, rand_x * scale, rand_y * scale),
+            None => continue,
+        }
     }
 
     println!("Saving output to file: {}", output);

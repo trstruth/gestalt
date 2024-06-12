@@ -51,6 +51,11 @@ impl EmojiManager {
         pixel: image::Rgba<u8>,
         image_size: u32,
     ) -> Option<&image::DynamicImage> {
+        // if the source pixel is fully transparent, return None
+        if pixel[3] == 0 {
+            return None;
+        }
+
         // get nearest emoji path
         let pixel_rgb = [pixel[0] as f64, pixel[1] as f64, pixel[2] as f64];
         let (_, nearest_emoji_path) = self
