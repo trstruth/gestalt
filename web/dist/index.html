@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Emoji Vision MVP</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        #controls {
+            margin-bottom: 20px;
+        }
+
+        #preview {
+            margin-bottom: 20px;
+        }
+
+        #preview img {
+            max-width: 100%;
+            border: 1px solid #ccc;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Emoji Vision MVP</h1>
+    <div id="controls">
+        <input type="file" id="targetImageInput" accept="image/*" />
+        <button id="generateButton">Generate Emoji Vision</button>
+    </div>
+    <div id="preview">
+        <h2>Uploaded Image</h2>
+        <img id="uploadedImage" alt="Uploaded target image" />
+    </div>
+    <div id="result">
+        <h2>Generated Mosaic</h2>
+        <canvas id="outputCanvas"></canvas>
+    </div>
+    <script src="bundle.js"></script>
+</body>
+
+</html>
