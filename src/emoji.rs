@@ -34,9 +34,13 @@ impl EmojiManager {
                 }
             };
 
-            let average_rgb = get_average_rgb(&loaded_emoji);
+            match get_average_rgb(&loaded_emoji) {
+                Some(average_rgb) => emoji_kd_tree.add(average_rgb, emoji_path_str).unwrap(),
+                None => println!(
+                    "warning: image {emoji_path_str} had no visible pixels and will be ignored"
+                ),
+            }
 
-            emoji_kd_tree.add(average_rgb, emoji_path_str).unwrap();
             emoji_id += 1;
         }
 
@@ -96,7 +100,7 @@ impl EmojiManager {
     }
 }
 
-fn get_average_rgb(img: &image::DynamicImage) -> [f64; NUM_RGB_CHANNELS] {
+fn get_average_rgb(img: &image::DynamicImage) -> Option<[f64; NUM_RGB_CHANNELS]> {
     let mut average_r: f64 = 0.0;
     let mut average_g: f64 = 0.0;
     let mut average_b: f64 = 0.0;
@@ -115,9 +119,13 @@ fn get_average_rgb(img: &image::DynamicImage) -> [f64; NUM_RGB_CHANNELS] {
         opaque_pixel_count += 1.0;
     }
 
+    if opaque_pixel_count == 0.0 {
+        return None;
+    }
+
     average_r /= opaque_pixel_count;
     average_g /= opaque_pixel_count;
     average_b /= opaque_pixel_count;
 
-    [average_r, average_g, average_b]
+    Some([average_r, average_g, average_b])
 }
