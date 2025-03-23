@@ -1,10 +1,8 @@
 use clap::{App, Arg};
-use sampler::Sampler;
+use gestalt::canvas::CanvasManager;
+use gestalt::emoji::EmojiManager;
+use gestalt::sampler::Sampler;
 use std::{convert::TryInto, error::Error};
-
-mod canvas;
-mod emoji;
-mod sampler;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let m = parse_args().get_matches();
@@ -45,7 +43,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("Opened image {} {}x{}", target_path, width, height);
 
     println!("Generating new EmojiManager");
-    let mut em = emoji::EmojiManager::new(emoji_dir)?;
+    let mut em = EmojiManager::new(emoji_dir)?;
 
     let canvas_width = width * scale;
     let canvas_height = height * scale;
@@ -53,7 +51,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         "Generating new CanvasManager with dimensions {}x{}",
         canvas_width, canvas_height
     );
-    let mut cm = canvas::CanvasManager::new(output, canvas_width, canvas_height, bg_color)?;
+    let mut cm = CanvasManager::new(output, canvas_width, canvas_height, bg_color)?;
 
     let sample_mode = m.value_of("sample_mode").unwrap_or("source");
 
