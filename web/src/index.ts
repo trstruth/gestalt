@@ -38,7 +38,7 @@ async function computeAverageRGB(image: HTMLImageElement): Promise<[number, numb
 }
 
 // Extract pixel data from an image using a hidden canvas.
-function getPixelData(image: HTMLImageElement, step: number = 10): PixelData[] {
+function getPixelData(image: HTMLImageElement, step: number = 100): PixelData[] {
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = image.width;
     tempCanvas.height = image.height;
@@ -171,7 +171,7 @@ async function run() {
             outputCtx.fillRect(0, 0, targetImg.width, targetImg.height);
 
             // Sample pixel data from the target image.
-            const pixels = getPixelData(targetImg, 10);
+            const pixels = getPixelData(targetImg, 3);
 
             // Generate placements via the WASM module.
             const layoutJsValue = emojiManager.generate_layout(pixels);

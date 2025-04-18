@@ -37,6 +37,6 @@ module.exports = {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist'),
         // Ensure asset URLs are relative to the output folder.
-        publicPath: './'
+        publicPath: '/'
     },
 };
