@@ -14,6 +14,10 @@ dev: wasm
 	@echo "Starting webpack dev server..."
 	cd web && npm start
 
+deploy: wasm
+	@echo "Building & deploying to gh-pages..."
+	cd web && npm run deploy
+
 # The 'clean' target removes the build artifacts.
 clean:
 	@echo "Cleaning up..."
