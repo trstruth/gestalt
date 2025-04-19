@@ -7,3 +7,9 @@
 
 .DS_Store
 .vscode
+
+/web/node_modules
+/web/dist/
+/web/pkg/
+/site/
+/docs/

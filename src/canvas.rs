@@ -23,10 +23,10 @@ impl<'a> CanvasManager<'a> {
         let mut canvas = image::RgbaImage::new(width, height);
         for (_, _, p) in canvas.enumerate_pixels_mut() {
             *p = image::Rgba([
-                (background_color >> 24) as u8,
-                (background_color >> 16) as u8,
-                (background_color >> 8) as u8,
-                background_color as u8,
+                ((background_color >> 16) & 0xFF) as u8, // Red
+                ((background_color >> 8) & 0xFF) as u8,  // Green
+                (background_color & 0xFF) as u8,         // Blue
+                ((background_color >> 24) & 0xFF) as u8, // Alpha
             ]);
         }
 
