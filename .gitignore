@@ -8,4 +8,8 @@
 .DS_Store
 .vscode
 
-node_modules
+/web/node_modules
+/web/dist/
+/web/pkg/
+/site/
+/docs/
