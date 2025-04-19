@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack serve --open"
+    "prestart": "node scripts/build-emoji-metadata.mjs",
+    "start": "webpack serve --open",
+    "prebuild": "node scripts/build-emoji-metadata.mjs"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +15,7 @@
   "devDependencies": {
     "@types/webpack-env": "^1.18.8",
     "copy-webpack-plugin": "^13.0.0",
+    "fast-average-color-node": "^3.1.0",
     "ts-loader": "^9.5.2",
     "typescript": "^5.8.2",
     "webpack": "^5.98.0",
