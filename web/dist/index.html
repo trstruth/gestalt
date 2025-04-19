@@ -97,13 +97,29 @@
 
             <label>
                 Scale
-                <input id="scaleInput" type="number" min="1" value="23" step="1">
+                <input id="scaleInput" type="number" min="1" value="25" step="1">
+            </label>
+
+            <label>
+              Padding (%)
+              <input id="marginInput" type="number" min="0" max="40" value="19" step="1">
             </label>
 
             <label>
                 Background
                 <input id="backgroundColorInput" type="text"
                                                  value="#ffffff" pattern="^#([0-9a-fA-F]{3}){1,2}$">
+            </label>
+
+            <label>
+              Output size
+              <select id="presetSelect">
+                <option value="original">crop</option>
+                <option value="iphone">iPhone</option>
+                <option value="desktopHD">1080p</option>
+                <option value="desktop2K">1440p</option>
+                <option value="desktop4K">4K</option>
+              </select>
             </label>
 
             <button id="generateButton" class="primary">Generate</button>
