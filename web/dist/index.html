@@ -1,49 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8" />
-    <title>Emoji Vision MVP</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 20px;
-        }
+    <head>
+        <meta charset="UTF-8" />
+        <title>Pokemoji</title>
+        <style>
+/* ---------- CSS variables ---------- */
+            :root {
+                --accent: #4c8bff;
+                --bg: #f6f8fa;
+                --text: #111;
+                --radius: 8px;
+                --gap: 1rem;
+                --border: 1px solid #d0d7de;
+                --shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+                font-family: system-ui, sans-serif;
+                color: var(--text);
+                background: var(--bg);
+                line-height: 1.5;
+                margin: 0;
+                padding: var(--gap);
+            }
+            
+            /* ---------- Global elements ---------- */
+            h1.title {
+                margin: 0 0 var(--gap);
+                text-align: center;
+                font-size: clamp(1.5rem, 2.5vw + 1rem, 2.5rem);
+            }
+            
+            input[type="file"] {
+                max-width: 180px;
+            }
+            
+            label {
+                display: flex;
+                flex-direction: column;
+                font-size: 0.875rem;
+                gap: 0.25rem;
+            }
+            
+            button.primary {
+                background: var(--accent);
+                color: #fff;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: var(--radius);
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+            button.primary:hover { background: #356fe6; }
+            
+            /* ---------- Layout containers ---------- */
+            .controls {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--gap);
+                align-items: flex-end;
+                justify-content: center;
+            }
+            
+            .panels {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: var(--gap);
+                margin-top: var(--gap);
+            }
+            
+            /* ---------- Card look ---------- */
+            .card {
+                border: var(--border);
+                border-radius: var(--radius);
+                background: #fff;
+                box-shadow: var(--shadow);
+                padding: var(--gap);
+            }
+            
+            /* ---------- Preview media ---------- */
+            #uploadedImage,
+            #outputCanvas {
+                width: 100%;
+                max-height: 60vh;
+                object-fit: contain;
+                border-radius: var(--radius);
+                border: var(--border);
+            }
 
-        #controls {
-            margin-bottom: 20px;
-        }
+        </style>
+    </head>
 
-        #preview {
-            margin-bottom: 20px;
-        }
+    <body>
+        <h1 class="title">Pokemoji</h1>
 
-        #preview img {
-            max-width: 100%;
-            border: 1px solid #ccc;
-        }
+        <section id="controls" class="card controls">
+            <input type="file" id="targetImageInput" accept="image/*" />
 
-        canvas {
-            border: 1px solid #ccc;
-        }
-    </style>
-</head>
+            <label>
+                Scale
+                <input id="scaleInput" type="number" min="1" value="23" step="1">
+            </label>
 
-<body>
-    <h1>Emoji Vision MVP</h1>
-    <div id="controls">
-        <input type="file" id="targetImageInput" accept="image/*" />
-        <button id="generateButton">Generate Emoji Vision</button>
-    </div>
-    <div id="preview">
-        <h2>Uploaded Image</h2>
-        <img id="uploadedImage" alt="Uploaded target image" />
-    </div>
-    <div id="result">
-        <h2>Generated Mosaic</h2>
-        <canvas id="outputCanvas"></canvas>
-    </div>
-    <script src="bundle.js"></script>
-</body>
+            <label>
+                Background
+                <input id="backgroundColorInput" type="text"
+                                                 value="#ffffff" pattern="^#([0-9a-fA-F]{3}){1,2}$">
+            </label>
+
+            <button id="generateButton" class="primary">Generate</button>
+        </section>
+
+        <div class="panels">
+            <section class="card">
+                <h2>Uploaded Image</h2>
+                <img id="uploadedImage" alt="Uploaded target image" />
+            </section>
+
+            <section class="card">
+                <h2>Generated Mosaic</h2>
+                <canvas id="outputCanvas"></canvas>
+            </section>
+        </div>
+
+        <script src="bundle.js"></script>
+    </body>
+
 
 </html>
